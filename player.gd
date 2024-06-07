@@ -8,6 +8,8 @@ extends CharacterBody3D
 @onready var face_lvl = get_node("all_raycast/face")
 @onready var new_pos = get_node("all_raycast/new_pos")
 
+@onready var anim_tree = get_node("AnimationTree").get("parameters/playback")
+
 var speed = 1
 var jump_vel = 4.5
 var mouse_sensitivity = 0.002
@@ -15,27 +17,37 @@ var mouse_sensitivity = 0.002
 var can_mantle = true
 var is_crouching = false
 
+#Player needs to run for a set amouont of time before they can wall run
+var can_wall_run_timer = 60
+var can_wall_run = true
+
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready():
 	
+	anim_tree.travel("standing_idle")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-
+	get_node("AnimationTree").active = true
+	
 func _physics_process(delta):
 	
 	control_loop(delta)
 	head_control()
 	run_state()
 	check_mantle()
+	wall_run_timer()
+	wall_run()
 	move_and_slide()
-	
-	
+		
 func control_loop(delta):
+	
+	print(gravity)
 	
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
+		
 
 	# Handle jump.
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
@@ -48,6 +60,9 @@ func control_loop(delta):
 	if direction:
 		velocity.x = direction.x * speed
 		velocity.z = direction.z * speed
+		
+		anim_tree.travel("standing_idle")
+		
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
 		velocity.z = move_toward(velocity.z, 0, speed)
@@ -65,9 +80,16 @@ func run_state():
 		
 		speed = 3
 		
+		
 	else:
 		
+		can_wall_run_timer = 60
 		speed = 1
+		
+		
+	#if Input.is_action_pressed("run") and velocity.z:
+		#
+		#can_wall_run_timer -= 1
 	
 func check_mantle():
 	
@@ -83,10 +105,11 @@ func check_mantle():
 			
 			if has_ledge and Input.is_action_just_pressed("jump"):
 				
+				anim_tree.travel("mantle_up")
 				var climb_tween = create_tween()
 				climb_tween.tween_property(self,"position",  new_pos.global_position,0.50)
 				#self.global_position = new_pos.global_position
-			
+				
 		else:
 			
 			gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -104,13 +127,68 @@ func _input(event):
 	if event.is_action_pressed("crouch"):
 		
 		check_crouch_state()
+		crouch_stand_anim()
 		is_crouching = not is_crouching
+		
+	if not is_crouching:
+		
+		if event.is_action_pressed("lean_left"):
+			
+			anim_tree.travel("lean_left")
+			
+		if event.is_action_released("lean_left"):
+			
+			anim_tree.travel("standing_idle")
+			
+			
+		if event.is_action_pressed("lean_right"):
+			
+			anim_tree.travel("lean_right")
+			
+		if event.is_action_released("lean_right"):
+			
+			anim_tree.travel("standing_idle")
+	
+func crouch_stand_anim():
+	
+	if is_crouching:
+		
+		anim_tree.travel("standing_idle")
+		
+	if not is_crouching:
+		
+		anim_tree.travel("crouch_idle")
 	
 func check_crouch_state():
 	
 	standing_col.disabled = not is_crouching
 	crouching_col.disabled = is_crouching
 	
+func wall_run_timer():
+	
+	if Input.is_action_pressed("run") and velocity.z:
+		
+		can_wall_run_timer -= 1
+		
+	if can_wall_run_timer <= 0:
+		
+		can_wall_run = true
+		
+	else:
+		
+		can_wall_run = false
+	
+func wall_run():
+	
+	if can_wall_run:
+			
+		if $all_raycast/check_L.is_colliding():
+			
+			gravity = gravity * 0.5
+			
+		if $all_raycast/check_R.is_colliding():
+			
+			gravity = gravity * 0.5
 	
 func _on_above_head_body_entered(_body):
 	

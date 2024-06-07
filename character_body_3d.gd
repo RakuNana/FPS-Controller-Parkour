@@ -209,9 +209,6 @@ func _on_above_head_body_exited(_body):
 	can_mantle = true
 	
 	
-	
 func wall_run():
 	
-	if is_on_wall() and speed >= 3:
-		
-		print("hi")
+	pass

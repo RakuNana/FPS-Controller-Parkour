@@ -347,6 +347,7 @@ xfade_time = 0.2
 xfade_time = 0.2
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_gr3fk"]
+states/Start/position = Vector2(114, 61)
 states/crouch_idle/node = SubResource("AnimationNodeAnimation_0m61l")
 states/crouch_idle/position = Vector2(767, 3)
 states/head_bob/node = SubResource("AnimationNodeAnimation_nh203")
@@ -360,7 +361,7 @@ states/mantle/position = Vector2(615, 162)
 states/standing_idle/node = SubResource("AnimationNodeAnimation_8mi8p")
 states/standing_idle/position = Vector2(336, 3)
 transitions = ["standing_idle", "crouch_idle", SubResource("AnimationNodeStateMachineTransition_0u38w"), "crouch_idle", "standing_idle", SubResource("AnimationNodeStateMachineTransition_xlw58"), "standing_idle", "lean_left", SubResource("AnimationNodeStateMachineTransition_ldwkr"), "lean_left", "standing_idle", SubResource("AnimationNodeStateMachineTransition_xnq3r"), "standing_idle", "lean_right", SubResource("AnimationNodeStateMachineTransition_cxgn6"), "lean_right", "standing_idle", SubResource("AnimationNodeStateMachineTransition_6aexh"), "standing_idle", "mantle", SubResource("AnimationNodeStateMachineTransition_w1gb2"), "mantle", "standing_idle", SubResource("AnimationNodeStateMachineTransition_oeijl"), "standing_idle", "head_bob", SubResource("AnimationNodeStateMachineTransition_cmx7i"), "head_bob", "standing_idle", SubResource("AnimationNodeStateMachineTransition_rp4l5")]
-graph_offset = Vector2(-26, -63)
+graph_offset = Vector2(-110, -315)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hyht8"]
 size = Vector3(1, 1.3, 1)
